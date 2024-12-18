@@ -1,0 +1,218 @@
+local Workspace = findservice(Game, "Workspace")
+local Map = findfirstchild(Workspace, "Map")
+local espObjects = {}
+local killSwitchActive = false
+local maxRenderDistance = 5000
+local IgnoreFolder = findfirstchild(Map, "Ignore")
+local CollectiblesFolder = IgnoreFolder and findfirstchild(IgnoreFolder, "Collectibles")
+local ToolsFolder = IgnoreFolder and findfirstchild(IgnoreFolder, "Tools")
+local AIHunterFolder = findfirstchild(Workspace, "AIHunter")
+local ThreatsFolder = findfirstchild(Workspace, "Threats")
+
+
+local mode = "Whitelist"  
+local toggles = { 
+    Collectibles = true,  
+    Tools = true,         
+    AIHunter = true,      
+    Threats = true        
+}
+local colors = { 
+    Collectibles = {0, 255, 0}, 
+    Tools = {255, 215, 0}, 
+    AIHunter = {255, 0, 0}, 
+    Threats = {0, 0, 255} 
+}
+local yOffsets = { 
+    AIHunter = 5, 
+    Threats = 10 
+}
+local blacklist = { 
+    "Laser Pointer", "GroundBerry", "Fuse", "Diving Gear", 
+    "Strange Root", "Lantern", "Makeshift Camera", "glass",
+    "GPS", "Flare Gun", "Tool Bag", "Torch", "Walky Talky",
+    "Watch", "Treasure Map",
+}
+local whitelist = { 
+    "Artifact A", "Artifact B", "Artifact C", "Artifact D", 
+    "Experimental Vision Goggles", "Scoped Rifle", "Special Ammunition Crate", "Ammunition Crate",
+    "Medkit", "Master Bypass Console", "Shield Pack", "Strange Drink", "Sniper Rifle", "Assault Shotgun",
+}
+
+
+local function isWhitelisted(itemName)
+    for _, baseName in ipairs(whitelist) do
+        if itemName:lower():find(baseName:lower(), 1, true) then return true end
+    end
+    return false
+end
+
+local function isBlacklisted(itemName)
+    local lowerName = itemName:lower()
+    for _, baseName in ipairs(blacklist) do
+        if lowerName:find(baseName:lower(), 1, true) then return true end
+    end
+    return lowerName:find("glass")
+end
+
+local function getPlayerPos()
+    local localPlayer = getlocalplayer()
+    local character = localPlayer and getcharacter(localPlayer)
+    return character and getposition(findfirstchild(character, "HumanoidRootPart"))
+end
+
+local function GetValidPart(item)
+    local itemClass = getclassname(item)
+    if itemClass == "Model" then
+        return findfirstchildofclass(item, "Part") or findfirstchildofclass(item, "MeshPart")
+    elseif itemClass == "Part" or itemClass == "MeshPart" or itemClass == "UnionOperation" then
+        return item
+    end
+    return nil
+end
+
+local function calculateDistance(pos1, pos2)
+    local dx, dy, dz = pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z
+    return math.sqrt(dx * dx + dy * dy + dz * dz)
+end
+
+local function removeTrailingNumbers(name)
+    return name:match("^(.-)%s*#%d+$") or name
+end
+
+local function ensureValidPart(item)
+    return findfirstchild(item, "HumanoidRootPart") or GetValidPart(item)
+end
+
+local function shouldSkipItemForAIHunter(itemName)
+    local lowerName = itemName:lower()
+    return lowerName == "heliland" or lowerName == "heliland2" or lowerName == "heliland3"
+end
+
+
+local function DrawESPForFolder(folder, category, useRenderDistance)
+    spawn(function()
+        local lastUpdate = tick()
+        while not killSwitchActive do
+            if folder and toggles[category] then
+                if tick() - lastUpdate > 0.1 then
+                    lastUpdate = tick()
+                    
+                    for _, item in ipairs(getchildren(folder)) do
+                        local itemName = getname(item)
+                        
+                        if isBlacklisted(itemName) or (category == "AIHunter" and shouldSkipItemForAIHunter(itemName)) then
+                            if espObjects[item] then
+                                espObjects[item].Text:Remove()
+                                espObjects[item] = nil
+                            end
+                        else
+                            local shouldHighlight = (category == "Collectibles") or (category == "AIHunter") or 
+                                (category == "Threats") or 
+                                (mode == "Blacklist" and not isBlacklisted(itemName)) or 
+                                (mode == "Whitelist" and isWhitelisted(itemName))
+                            
+                            if shouldHighlight then
+                                local validPart = ensureValidPart(item)
+                                if validPart and not espObjects[item] then
+                                    espObjects[item] = { 
+                                        Part = validPart, 
+                                        Category = category,
+                                        Name = itemName
+                                    }
+                                end
+                            else
+                                if espObjects[item] then
+                                    if espObjects[item].Text then
+                                        espObjects[item].Text:Remove()
+                                    end
+                                    espObjects[item] = nil
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            wait(2)
+        end
+    end)
+end
+
+
+local function RenderESP()
+    spawn(function()
+        while not killSwitchActive do
+            local playerPos = getPlayerPos()
+            
+            if playerPos then
+                for item, esp in pairs(espObjects) do
+                    local success, errorMsg = pcall(function()
+                        if not item or not getparent(item) then
+                            if esp.Text then esp.Text:Remove() end
+                            espObjects[item] = nil
+                            return
+                        end
+                        
+                        if not esp.Text then
+                            esp.Text = Drawing.new("Text")
+                            esp.Text.Size = 14
+                            esp.Text.Color = colors[esp.Category]
+                            esp.Text.Center = true
+                            esp.Text.Outline = true
+                            esp.Text.Visible = true
+                        end
+                        
+                        local partPosition = getposition(esp.Part)
+                        local distance = calculateDistance(playerPos, partPosition)
+                        
+                        if not useRenderDistance or distance <= maxRenderDistance then
+                            local screenPosition, onScreen = worldtoscreenpoint({partPosition.x, partPosition.y, partPosition.z})
+                            if onScreen then
+                                local offsetY = yOffsets[esp.Category] or 0
+                                esp.Text.Position = {screenPosition.x, screenPosition.y + offsetY}
+                                esp.Text.Text = string.format("%s [%.2fm]", removeTrailingNumbers(esp.Name), distance)
+                                esp.Text.Visible = true
+                            else
+                                esp.Text.Visible = false
+                            end
+                        else
+                            esp.Text.Visible = false
+                        end
+                    end)
+                    
+                    if not success then
+                        warn("Error in RenderESP:", errorMsg)
+                        pcall(function()
+                            if esp.Text then esp.Text:Remove() end
+                            espObjects[item] = nil
+                        end)
+                    end
+                end
+            end
+            wait()
+        end
+    end)
+end
+
+local function monitorKeyPress()
+    spawn(function()
+        while not killSwitchActive do
+            if getpressedkey() == "End" then
+                killSwitchActive = true
+                Drawing.clear()
+                espObjects = {}
+                break
+            end
+            wait(0.1)
+        end
+    end)
+end
+
+
+if toggles.Collectibles then DrawESPForFolder(CollectiblesFolder, "Collectibles", true) end
+if toggles.Tools then DrawESPForFolder(ToolsFolder, "Tools", true) end
+if toggles.AIHunter and AIHunterFolder then DrawESPForFolder(AIHunterFolder, "AIHunter", false) end
+if toggles.Threats and ThreatsFolder then DrawESPForFolder(ThreatsFolder, "Threats", false) end
+
+spawn(RenderESP)
+monitorKeyPress()
