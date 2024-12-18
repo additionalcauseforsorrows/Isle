@@ -1,3 +1,113 @@
+glowzy
+glow0001
+Idle
+
+
+
+Text Channel
+pub-luas
+Thread
+Thread:Isle | Collectible, item and NPC esp
+isle
+Isle | Collectible, item and NPC esp chat
+Isle | Collectible, item and NPC esp
+Misc
+Other Games
+
+QOL
+November 10, 2024
+
+Ferris💤
+OP
+ — 11/10/2024 9:55 AM
+you can customize it to your liking, you can swap between blacklist and whitelist
+
+Green = Collectibles
+Red = Hunters
+Blue = Threats (Frogspawns, Agent, Serpent, Turrets)
+Yellow = Items
+
+I probably wont be updating this script, until Isle 10 comes out (edited)
+Ammunition Crate
+Artifact A
+Artifact B
+Artifact C
+Artifact D
+Assault Shotgun
+Expand
+Item Names - ISLE.txt
+1 KB
+
+1
+
+Follow
+
+
+Ferris💤
+OP
+ — 11/10/2024 9:56 AM
+local Workspace = findservice(Game, "Workspace")
+local Map = findfirstchild(Workspace, "Map")
+local espObjects = {}
+local killSwitchActive = false
+local maxRenderDistance = 50000
+local IgnoreFolder = findfirstchild(Map, "Ignore")
+Expand
+Isle ESP - Severe.lua
+9 KB
+
+Ferris💤
+Click to see attachment
+
+Ferris💤
+OP
+ — 11/10/2024 9:59 AM
+change the render distance, i recommend like 1000
+
+Hunters and Threats dont get affected by Render Distance, You can change this by going to the bottom of the script and just changing the false to true (edited)
+[10:02 AM]
+ i hope it works for you guys
+
+Tom — 11/10/2024 10:03 AM
+awesome
+
+BACKWOODS — 11/10/2024 10:04 AM
+@Ferris💤 this script can use alot of optimizations i recommend u to use a wait() each iteration for getchildren(folder) and putting espObjects in its own thread using spawn
+
+BACKWOODS
+@Ferris💤 this script can use alot of optimizations i recommend u to use a wait() each iteration for getchildren(folder) and putting espObjects in its own thread using spawn
+
+Ferris💤
+OP
+ — 11/10/2024 10:05 AM
+ oki
+
+BACKWOODS — 11/10/2024 10:05 AM
+it will be overall a smoother experience
+
+Ferris💤
+OP
+ — 11/10/2024 10:11 AM
+local Workspace = findservice(Game, "Workspace")
+local Map = findfirstchild(Workspace, "Map")
+local espObjects = {}
+local killSwitchActive = false
+local maxRenderDistance = 5000
+local IgnoreFolder = findfirstchild(Map, "Ignore")
+Expand
+Isle ESP - Severe.lua
+10 KB
+
+@Ferris💤
+Click to see attachment
+
+kirby — 11/10/2024 11:06 AM
+You an actual tryhard for using luau path like that
+I would kms if there ever wrong path happend, ADHD hit hard
+
+1
+[11:07 AM]
+Buttersmooth Esp Render (edited)
 local Workspace = findservice(Game, "Workspace")
 local Map = findfirstchild(Workspace, "Map")
 local espObjects = {}
@@ -98,121 +208,151 @@ local function DrawESPForFolder(folder, category, useRenderDistance)
                 if tick() - lastUpdate > 0.1 then
                     lastUpdate = tick()
                     
-                    for _, item in ipairs(getchildren(folder)) do
-                        local itemName = getname(item)
-                        
-                        if isBlacklisted(itemName) or (category == "AIHunter" and shouldSkipItemForAIHunter(itemName)) then
-                            if espObjects[item] then
-                                espObjects[item].Text:Remove()
-                                espObjects[item] = nil
-                            end
-                        else
-                            local shouldHighlight = (category == "Collectibles") or (category == "AIHunter") or 
-                                (category == "Threats") or 
-                                (mode == "Blacklist" and not isBlacklisted(itemName)) or 
-                                (mode == "Whitelist" and isWhitelisted(itemName))
-                            
-                            if shouldHighlight then
-                                local validPart = ensureValidPart(item)
-                                if validPart and not espObjects[item] then
-                                    espObjects[item] = { 
-                                        Part = validPart, 
-                                        Category = category,
-                                        Name = itemName
-                                    }
-                                end
-                            else
-                                if espObjects[item] then
-                                    if espObjects[item].Text then
-                                        espObjects[item].Text:Remove()
-                                    end
-                                    espObjects[item] = nil
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-            wait(2)
-        end
-    end)
+... (119 lines left)
+Collapse
+Isle ESP - Severe.lua
+9 KB
+
+Ferris💤
+OP
+ — 11/10/2024 11:08 AM
+
+[11:12 AM]
+that sure as hell made it smooth
+
+ight — 11/10/2024 12:54 PM
+holy based
+November 12, 2024
+
+Rapl — 11/12/2024 1:09 PM
+@Ferris💤 thank you
+[1:09 PM]
+if you remember me
+
+Send a message in "Isle | Collectible, item and NPC esp"
+﻿
+
+
+
+
+to select
+
+4 Results
+New
+Old
+Relevant
+chat
+Severians
+
+Ferris💤 — 11/18/2024 8:21 AM
+isle
+Isle | Collectible, item and NPC esp
+pub-luas
+
+Ferris💤
+OP
+ — 11/10/2024 9:55 AM
+you can customize it to your liking, you can swap between blacklist and whitelist
+
+Green = Collectibles
+Red = Hunters
+Blue = Threats (Frogspawns, Agent, Serpent, Turrets)
+Yellow = Items
+
+I probably wont be updating this script, until Isle 10 comes out (edited)
+Ammunition Crate
+Artifact A
+Artifact B
+Artifact C
+Artifact D
+Assault Shotgun
+Expand
+Item Names - ISLE.txt
+1 KB
+Isle esp
+lua-requests
+
+Rapl
+OP
+ — 11/10/2024 3:46 AM
+game link: https://www.roblox.com/games/3095204897/Isle
+Roblox
+Isle
+Check out Isle. It’s one of the millions of unique, user-generated 3D experiences created on Roblox. Brought here against your will.
+No one has ever escaped alive.
+...
+Something's lurking.
+There has to be some way out.
+
+M to open Journal.
+Click people to use weapons.
+Update 9.5 is moved to update 10.
+(Built by Bad_B0y, Scripted by treebe...
+
+
+Rapl
+OP
+ — 11/10/2024 3:46 AM
+esp for items, the important stuff and Stan (the monster)
+local Workspace = findservice(Game, "Workspace")
+local Map = findfirstchild(Workspace, "Map")
+local espObjects = {}
+local killSwitchActive = false
+local maxRenderDistance = 5000
+local IgnoreFolder = findfirstchild(Map, "Ignore")
+local CollectiblesFolder = IgnoreFolder and findfirstchild(IgnoreFolder, "Collectibles")
+local ToolsFolder = IgnoreFolder and findfirstchild(IgnoreFolder, "Tools")
+local AIHunterFolder = findfirstchild(Workspace, "AIHunter")
+local ThreatsFolder = findfirstchild(Workspace, "Threats")
+
+
+local mode = "Whitelist"  
+local toggles = { 
+    Collectibles = true,  
+    Tools = true,         
+    AIHunter = true,      
+    Threats = true        
+}
+local colors = { 
+    Collectibles = {0, 255, 0}, 
+    Tools = {255, 215, 0}, 
+    AIHunter = {255, 0, 0}, 
+    Threats = {0, 0, 255} 
+}
+local yOffsets = { 
+    AIHunter = 5, 
+    Threats = 10 
+}
+local blacklist = { 
+    "Laser Pointer", "GroundBerry", "Fuse", "Diving Gear", 
+    "Strange Root", "Lantern", "Makeshift Camera", "glass",
+    "GPS", "Flare Gun", "Tool Bag", "Torch", "Walky Talky",
+    "Watch", "Treasure Map",
+}
+local whitelist = { 
+    "Artifact A", "Artifact B", "Artifact C", "Artifact D", 
+    "Experimental Vision Goggles", "Scoped Rifle", "Special Ammunition Crate", "Ammunition Crate",
+    "Medkit", "Master Bypass Console", "Shield Pack", "Strange Drink", "Sniper Rifle", "Assault Shotgun",
+}
+
+
+local function isWhitelisted(itemName)
+    for _, baseName in ipairs(whitelist) do
+        if itemName:lower():find(baseName:lower(), 1, true) then return true end
+    end
+    return false
 end
 
-
-local function RenderESP()
-    spawn(function()
-        while not killSwitchActive do
-            local playerPos = getPlayerPos()
-            
-            if playerPos then
-                for item, esp in pairs(espObjects) do
-                    local success, errorMsg = pcall(function()
-                        if not item or not getparent(item) then
-                            if esp.Text then esp.Text:Remove() end
-                            espObjects[item] = nil
-                            return
-                        end
-                        
-                        if not esp.Text then
-                            esp.Text = Drawing.new("Text")
-                            esp.Text.Size = 14
-                            esp.Text.Color = colors[esp.Category]
-                            esp.Text.Center = true
-                            esp.Text.Outline = true
-                            esp.Text.Visible = true
-                        end
-                        
-                        local partPosition = getposition(esp.Part)
-                        local distance = calculateDistance(playerPos, partPosition)
-                        
-                        if not useRenderDistance or distance <= maxRenderDistance then
-                            local screenPosition, onScreen = worldtoscreenpoint({partPosition.x, partPosition.y, partPosition.z})
-                            if onScreen then
-                                local offsetY = yOffsets[esp.Category] or 0
-                                esp.Text.Position = {screenPosition.x, screenPosition.y + offsetY}
-                                esp.Text.Text = string.format("%s [%.2fm]", removeTrailingNumbers(esp.Name), distance)
-                                esp.Text.Visible = true
-                            else
-                                esp.Text.Visible = false
-                            end
-                        else
-                            esp.Text.Visible = false
-                        end
-                    end)
-                    
-                    if not success then
-                        warn("Error in RenderESP:", errorMsg)
-                        pcall(function()
-                            if esp.Text then esp.Text:Remove() end
-                            espObjects[item] = nil
-                        end)
-                    end
-                end
-            end
-            wait()
-        end
-    end)
+local function isBlacklisted(itemName)
+    local lowerName = itemName:lower()
+    for _, baseName in ipairs(blacklist) do
+        if lowerName:find(baseName:lower(), 1, true) then return true end
+    end
+    return lowerName:find("glass")
 end
 
-local function monitorKeyPress()
-    spawn(function()
-        while not killSwitchActive do
-            if getpressedkey() == "End" then
-                killSwitchActive = true
-                Drawing.clear()
-                espObjects = {}
-                break
-            end
-            wait(0.1)
-        end
-    end)
+local function getPlayerPos()
+    local localPlayer = getlocalplayer()
+    local character = localPlayer and getcharacter(localPlayer)
+    return character and getposition(findfirstchild(character, "HumanoidRootPart"))
 end
-
-
-if toggles.Collectibles then DrawESPForFolder(CollectiblesFolder, "Collectibles", true) end
-if toggles.Tools then DrawESPForFolder(ToolsFolder, "Tools", true) end
-if toggles.AIHunter and AIHunterFolder then DrawESPForFolder(AIHunterFolder, "AIHunter", false) end
-if toggles.Threats and ThreatsFolder then DrawESPForFolder(ThreatsFolder, "Threats", false) end
-
-spawn(RenderESP)
-monitorKeyPress()
